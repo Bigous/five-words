@@ -172,6 +172,8 @@ auto main() -> int
 
 		boost::iostreams::mapped_file mm_file( file_name, std::ios::binary | std::ios::in );
 
+		// We don't need the string_view. Coult use the mm_file directly, but it's easyer to use strings and string_view is
+		// very cheap. Could be std::span too.
 		std::string_view file_content{ mm_file.const_data(), mm_file.size() };
 
 		read_words( file_content, bits_to_index, index_to_bits, index_to_words, letter_to_words_bits, letter_mask );
@@ -192,13 +194,14 @@ auto main() -> int
 							<< total_time << "us Total time\n"
 							<< "Found " << solutions << " solutions" << std::endl;
 	} catch( const std::exception &exception ) {
-		std::cerr << "Unhandled exception: " << exception.what();
+		std::cerr << "Unhandled exception: " << exception.what() << std::endl;
 	}
 	return 0;
 }
 
 void print_output( const std::vector< std::string_view > &index_to_words, std::array< std::size_t, 5 > &words )
 {
+	// doint it in a string because it's called from inside threads
 	std::stringstream ss;
 	for( const auto &w: words ) {
 		ss << index_to_words[w] << ' ';
@@ -233,8 +236,8 @@ auto find_words( const std::array< std::uint32_t, 26 >                  &letter_
 		// Use parallelism at the top level only
 		if( num_words == 0 || num_words == 1 ) {
 			num_solutions += std::transform_reduce(
-					std::execution::par_unseq, letter_to_words_bits[i].cbegin(), letter_to_words_bits[i].cend(),
-					static_cast< std::size_t >( 0 ), std::plus{}, [&]( const std::uint32_t &w ) -> std::size_t {
+					std::execution::par_unseq, letter_to_words_bits[i].cbegin(), letter_to_words_bits[i].cend(), std::size_t{ 0 },
+					std::plus{}, [&]( const std::uint32_t &w ) -> std::size_t {
 						if( ( total_bits & w ) != 0 ) {
 							return 0;
 						}
