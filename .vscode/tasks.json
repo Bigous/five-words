@@ -1,0 +1,29 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Debug",
+      "type": "cppbuild",
+      "command": "cmake",
+      "args": ["--build", "--preset", "x64-debug"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$msCompile"],
+      "group": "build"
+    },
+    {
+      "label": "Clean Build Debug",
+      "type": "cppbuild",
+      "command": "cmake",
+      "args": ["--build", "--preset", "x64-debug", "--clean-first"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$msCompile"],
+      "group": "build"
+    }
+  ]
+}
